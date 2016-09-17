@@ -18,6 +18,8 @@
             this.btnConnect = new System.Windows.Forms.Button();
             this.cbxDatabases = new System.Windows.Forms.ComboBox();
             this.lbxTables = new System.Windows.Forms.ListBox();
+            this.dgvData = new System.Windows.Forms.DataGridView();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvData)).BeginInit();
             this.SuspendLayout();
             // 
             // btnConnect
@@ -34,10 +36,11 @@
             // 
             // cbxDatabases
             // 
+            this.cbxDatabases.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbxDatabases.FormattingEnabled = true;
             this.cbxDatabases.Location = new System.Drawing.Point(12, 21);
             this.cbxDatabases.Name = "cbxDatabases";
-            this.cbxDatabases.Size = new System.Drawing.Size(207, 21);
+            this.cbxDatabases.Size = new System.Drawing.Size(207, 28);
             this.cbxDatabases.TabIndex = 1;
             this.cbxDatabases.SelectedIndexChanged += new System.EventHandler(this.cbxDatabases_SelectedIndexChanged);
             // 
@@ -45,23 +48,40 @@
             // 
             this.lbxTables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.lbxTables.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbxTables.FormattingEnabled = true;
-            this.lbxTables.Location = new System.Drawing.Point(12, 48);
+            this.lbxTables.ItemHeight = 20;
+            this.lbxTables.Location = new System.Drawing.Point(12, 61);
             this.lbxTables.Name = "lbxTables";
-            this.lbxTables.Size = new System.Drawing.Size(207, 316);
+            this.lbxTables.Size = new System.Drawing.Size(207, 304);
             this.lbxTables.TabIndex = 2;
+            this.lbxTables.SelectedIndexChanged += new System.EventHandler(this.lbxTables_SelectedIndexChanged);
+            // 
+            // dgvData
+            // 
+            this.dgvData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvData.Location = new System.Drawing.Point(225, 86);
+            this.dgvData.Name = "dgvData";
+            this.dgvData.Size = new System.Drawing.Size(408, 278);
+            this.dgvData.TabIndex = 3;
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(645, 372);
+            this.Controls.Add(this.dgvData);
             this.Controls.Add(this.lbxTables);
             this.Controls.Add(this.cbxDatabases);
             this.Controls.Add(this.btnConnect);
             this.Name = "frmMain";
             this.Text = "SEDC Data Browser - not connected";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.frmMain_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvData)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -71,6 +91,7 @@
         private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.ComboBox cbxDatabases;
         private System.Windows.Forms.ListBox lbxTables;
+        private System.Windows.Forms.DataGridView dgvData;
     }
 }
 
