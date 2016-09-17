@@ -8,8 +8,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataBrowser.ViewModels;
 using System.Data.SqlClient;
+using DataBrowser.Core;
 
 namespace DataBrowser
 {
@@ -20,61 +20,36 @@ namespace DataBrowser
             InitializeComponent();
         }
 
-        private SqlConnection connection;
+        private DataBrowseService dataBrowseService;
 
-        private void btnConnect_Click(object sender, EventArgs e)
+        private async void btnConnect_Click(object sender, EventArgs e)
         {
             var connectionForm = new ConnectionForm();
             if (connectionForm.ShowDialog() == DialogResult.OK)
             {
-                //get connection parameters
                 var connectionData = connectionForm.GetConnectionData();
-                ConnectDatabaseAsync(connectionData);
-            }
-        }
-
-        private async void ConnectDatabaseAsync(ConnectionData connectionData)
-        {
-            var cnnString = connectionData.GetConnectionString();
-            Text = $"SEDC Data Browser - connecting to {connectionData.ServerName}";
-
-            connection = new SqlConnection(cnnString);
-            try
-            {
-                await connection.OpenAsync();
-
-                DataTable databases = connection.GetSchema("Databases");
-                var databaseNames = new List<string>();
-                foreach (DataRow database in databases.Rows)
+                dataBrowseService = new DataBrowseService(connectionData);
+                Text = $"SEDC Data Browser - connecting to {connectionData.ServerName}";
+                try
                 {
-                    databaseNames.Add(database.Field<string>("database_name"));
+                    await dataBrowseService.Connect();
+                    Text = $"SEDC Data Browser - connected to {connectionData.ServerName}";
                 }
-                cbxDatabases.DataSource = databaseNames;
-
-                Text = $"SEDC Data Browser - connected to {connectionData.ServerName}";
+                catch (SqlException)
+                {
+                    Text = $"SEDC Data Browser - connecting to {connectionData.ServerName} failed";
+                    throw;
+                }
+                cbxDatabases.DataSource = (await dataBrowseService.GetDatabaseNames()).ToList();
             }
-            catch (SqlException ex)
-            {
-                Text = $"SEDC Data Browser - connecting to {connectionData.ServerName} failed";
-            }
-        }
-
-        private void frmMain_Load(object sender, EventArgs e)
-        {
-
         }
 
         private void cbxDatabases_SelectedIndexChanged(object sender, EventArgs e)
         {
             var databaseName = (string)cbxDatabases.SelectedItem;
-            connection.ChangeDatabase(databaseName);
-            var dataTables = connection.GetSchema("Tables");
-            var tableNames = new List<string>();
-            foreach (DataRow table in dataTables.Rows)
-            {
-                tableNames.Add(table.Field<string>("TABLE_NAME"));
-            }
-            lbxTables.DataSource = tableNames;
+            var task = dataBrowseService.GetTableNames(databaseName);
+            task.Wait();
+            lbxTables.DataSource = task.Result.ToList();
         }
 
         /// <summary>
@@ -86,7 +61,7 @@ namespace DataBrowser
             if (disposing && (components != null))
             {
                 components.Dispose();
-                connection.Dispose();
+                dataBrowseService.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -96,12 +71,7 @@ namespace DataBrowser
             var databaseName = (string)cbxDatabases.SelectedItem;
             var tableName = (string)lbxTables.SelectedItem;
 
-            var dataColumns = connection.GetSchema("Columns", new string[] { null, null, tableName, null});
-            var columnNames = new List<string>();
-            foreach (DataRow table in dataColumns.Rows)
-            {
-                columnNames.Add(table.Field<string>("COLUMN_NAME"));
-            }
+            var columnNames = (await dataBrowseService.GetColumnNames(databaseName, tableName)).ToList();
 
             dgvData.Columns.Clear();
             foreach (var cname in columnNames)
@@ -109,20 +79,10 @@ namespace DataBrowser
                 dgvData.Columns.Add(cname, cname);
             }
 
-            using (SqlCommand command = new SqlCommand())
+            var rowData = await dataBrowseService.GetData(databaseName, tableName);
+            foreach (var item in rowData)
             {
-                command.Connection = connection;
-                command.CommandText = $"Select * from {tableName}";
-
-                using (var dataReader = await command.ExecuteReaderAsync())
-                {
-                    while (dataReader.Read())
-                    {
-                        object[] values = new object[dataReader.FieldCount];
-                        dataReader.GetValues(values);
-                        dgvData.Rows.Add(values);
-                    }
-                }
+                dgvData.Rows.Add(item.ToArray());
             }
         }
     }

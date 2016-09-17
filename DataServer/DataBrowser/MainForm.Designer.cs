@@ -80,7 +80,6 @@
             this.Name = "frmMain";
             this.Text = "SEDC Data Browser - not connected";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Load += new System.EventHandler(this.frmMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvData)).EndInit();
             this.ResumeLayout(false);
 

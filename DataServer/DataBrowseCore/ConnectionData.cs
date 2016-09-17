@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataBrowser.ViewModels
+namespace DataBrowser.Core
 {
     public class ConnectionData
     {

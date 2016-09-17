@@ -1,4 +1,4 @@
-﻿namespace DataBrowser.ViewModels
+﻿namespace DataBrowser.Core
 {
     public enum AuthenticationType
     {
