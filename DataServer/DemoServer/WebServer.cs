@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace DemoServer
 {
@@ -14,8 +16,17 @@ namespace DemoServer
 
         public void Start()
         {
-            Socket s = new Socket();
-            
+            Socket s = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            s.Bind(new IPEndPoint(IPAddress.Any, Port));
+            s.Listen(10);
+
+            int i = 0;
+            while (true)
+            {
+                Console.WriteLine("looping " + i++);
+                var requestHandler = new RequestHandler(s);
+                requestHandler.AcceptRequest();
+            }
         }
     }
 }

@@ -10,7 +10,9 @@ namespace DemoServer
     {
         static void Main(string[] args)
         {
-
+            var port = 8082;
+            WebServer ws = new WebServer(port);
+            ws.Start();
         }
     }
 }
