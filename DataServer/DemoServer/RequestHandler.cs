@@ -31,6 +31,11 @@ namespace DemoServer
             Console.WriteLine(request);
 
             //parse request
+            var requestParser = new RequestParser();
+            var parsedRequest = requestParser.ParseRequest(request);
+
+            parsedRequest.Headers.Get("Host");
+
 
             //return response
             string myResponse = "<h1>HELLO FROM SEDC SERVER</h1>";

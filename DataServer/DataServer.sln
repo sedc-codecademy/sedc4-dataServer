@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBrowseCore", "DataBrows
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoServer", "DemoServer\DemoServer.csproj", "{A50CC0B9-4C2E-4990-933F-586B9FF693E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IEnumerableDemo", "IEnumerableDemo\IEnumerableDemo.csproj", "{4C03BE1F-8C6A-48F4-B24A-AF88B873E19A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoServerTests", "DemoServerTests\DemoServerTests.csproj", "{F61B8F27-CB02-48B9-BE60-9A7D96367E1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{A50CC0B9-4C2E-4990-933F-586B9FF693E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A50CC0B9-4C2E-4990-933F-586B9FF693E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A50CC0B9-4C2E-4990-933F-586B9FF693E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C03BE1F-8C6A-48F4-B24A-AF88B873E19A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C03BE1F-8C6A-48F4-B24A-AF88B873E19A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C03BE1F-8C6A-48F4-B24A-AF88B873E19A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C03BE1F-8C6A-48F4-B24A-AF88B873E19A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F61B8F27-CB02-48B9-BE60-9A7D96367E1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F61B8F27-CB02-48B9-BE60-9A7D96367E1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F61B8F27-CB02-48B9-BE60-9A7D96367E1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F61B8F27-CB02-48B9-BE60-9A7D96367E1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
