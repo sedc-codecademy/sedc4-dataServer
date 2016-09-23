@@ -20,7 +20,7 @@ namespace DemoServer.Tests
             //2. Act
             var actual = parser.ParseRequest(request);
             //3. Assert
-            Assert.AreEqual(Method.Get, actual.Method);
+            Assert.AreEqual(Method.Unknown, actual.Method);
             Assert.AreEqual(0, actual.Headers.Count());
         }
     }
