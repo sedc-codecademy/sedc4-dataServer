@@ -56,6 +56,30 @@ Accept: text/html";
         }
 
         [TestMethod]
+        public void ParseRequest_BasicRequest_WindowsStyleNewLine_Test()
+        {
+            //1. Arrange
+            var parser = new RequestParser();
+            var request = "GET / HTTP/1.1\r\nHost: localhost:8082\r\nConnection: keep-alive\r\nUser-Agent: Browser-Specific\r\nAccept: text/html";
+            //2. Act
+            var actual = parser.ParseRequest(request);
+            //3. Assert
+            Assert.AreEqual(Method.Get, actual.Method);
+            Assert.AreEqual(4, actual.Headers.Count());
+            var host = actual.Headers.Get("host");
+            Assert.AreEqual("localhost:8082", host.Value);
+            var connection = actual.Headers.Get("connection");
+            Assert.AreEqual("keep-alive", connection.Value);
+            var ua = actual.Headers.Get("User-Agent");
+            Assert.AreEqual("Browser-Specific", ua.Value);
+            var accept = actual.Headers.Get("Accept");
+            Assert.AreEqual("text/html", accept.Value);
+            Assert.AreEqual(string.Empty, actual.Body);
+            Assert.AreEqual("/", actual.Location);
+            Assert.AreEqual(0, actual.QueryParameters.Count);
+        }
+
+        [TestMethod]
         public void ParseRequest_PostRequest_WithBody_WithPath_WithQuery_Test()
         {
             //1. Arrange
@@ -219,6 +243,64 @@ my-header: my-value, my-other-vaklue";
             Assert.AreEqual("2", actual.QueryParameters["two"]);
             Assert.IsTrue(actual.QueryParameters.ContainsKey("whatever"));
             Assert.AreEqual("something a", actual.QueryParameters["whatever"]);
+        }
+
+        [TestMethod]
+        public void ParseRequest_PostRequest_NoBody_WithPath_WithQuery_WithAmpersandParam_Test()
+        {
+            //1. Arrange
+            var parser = new RequestParser();
+            var request = @"POST /path/to/somewhere/file.ext?two=2&one=1&whatever=something%26a HTTP/1.1
+Host: localhost:8082
+Connection: keep-alive
+Content-Length: 231
+my-header: my-value, my-other-vaklue";
+            //2. Act
+            var actual = parser.ParseRequest(request);
+            //3. Assert
+            Assert.AreEqual(Method.Post, actual.Method);
+            Assert.AreEqual(4, actual.Headers.Count());
+            var host = actual.Headers.Get("host");
+            Assert.AreEqual("localhost:8082", host.Value);
+            var connection = actual.Headers.Get("connection");
+            Assert.AreEqual("keep-alive", connection.Value);
+            var cl = actual.Headers.Get("Content-Length");
+            Assert.AreEqual("231", cl.Value);
+            var myHeader = actual.Headers.Get("my-header");
+            Assert.AreEqual("my-value, my-other-vaklue", myHeader.Value);
+            Assert.AreEqual(string.Empty, actual.Body);
+            Assert.AreEqual("/path/to/somewhere/file.ext", actual.Location);
+            Assert.AreEqual(3, actual.QueryParameters.Count);
+            Assert.IsTrue(actual.QueryParameters.ContainsKey("one"));
+            Assert.AreEqual("1", actual.QueryParameters["one"]);
+            Assert.IsTrue(actual.QueryParameters.ContainsKey("two"));
+            Assert.AreEqual("2", actual.QueryParameters["two"]);
+            Assert.IsTrue(actual.QueryParameters.ContainsKey("whatever"));
+            Assert.AreEqual("something&a", actual.QueryParameters["whatever"]);
+        }
+
+        [TestMethod]
+        public void ParseRequest_PostRequest_WithBody_NoPath_NoQuery_WindowsStyleLineEnding_Test()
+        {
+            //1. Arrange
+            var parser = new RequestParser();
+            var request = "POST / HTTP/1.1\r\nHost: localhost:8082\r\nConnection: keep-alive\r\nContent-Length: 231\r\nmy-header: my-value, my-other-vaklue\r\n\r\nbody";
+            //2. Act
+            var actual = parser.ParseRequest(request);
+            //3. Assert
+            Assert.AreEqual(Method.Post, actual.Method);
+            Assert.AreEqual(4, actual.Headers.Count());
+            var host = actual.Headers.Get("host");
+            Assert.AreEqual("localhost:8082", host.Value);
+            var connection = actual.Headers.Get("connection");
+            Assert.AreEqual("keep-alive", connection.Value);
+            var cl = actual.Headers.Get("Content-Length");
+            Assert.AreEqual("231", cl.Value);
+            var myHeader = actual.Headers.Get("my-header");
+            Assert.AreEqual("my-value, my-other-vaklue", myHeader.Value);
+            Assert.AreEqual(@"body", actual.Body);
+            Assert.AreEqual("/", actual.Location);
+            Assert.AreEqual(0, actual.QueryParameters.Count);
         }
     }
 }

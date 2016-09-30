@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -34,31 +35,42 @@ namespace DemoServer
             var requestParser = new RequestParser();
             var parsedRequest = requestParser.ParseRequest(request);
 
-            parsedRequest.Headers.Get("Host");
-
-
             //return response
-            string myResponse = "<h1>HELLO FROM SEDC SERVER</h1>";
-            var responseBytes = Encoding.UTF8.GetBytes(myResponse);
+            if ((parsedRequest.Method == Method.Get) && (parsedRequest.Location == "/favicon.ico"))
+            {
+                var responseBytes = File.ReadAllBytes("favicon.ico");
+                var headers = new HeaderCollection();
+                headers.Add("Content-Type", "image/ico");
+                string headersString = MakeHeader(headers, responseBytes.Length);
+                var headerBytes = Encoding.UTF8.GetBytes(headersString);
+                clientSocket.Send(headerBytes);
+                clientSocket.Send(responseBytes);
+            }
+            else
+            {
+                var responseGenerator = new ResponseGenerator();
 
-            string headers = MakeHeader(responseBytes.Length);
-            var headerBytes = Encoding.UTF8.GetBytes(headers);
+                var myResponse = responseGenerator.GenerateResponse(parsedRequest);
+                var responseBytes = Encoding.UTF8.GetBytes(myResponse.Body);
 
-            clientSocket.Send(headerBytes);
-            clientSocket.Send(responseBytes);
-
+                string headers = MakeHeader(myResponse.Headers, responseBytes.Length);
+                var headerBytes = Encoding.UTF8.GetBytes(headers);
+                clientSocket.Send(headerBytes);
+                clientSocket.Send(responseBytes);
+            }
             clientSocket.Close();
         }
 
-        private string MakeHeader(int contentLength)
+        private string MakeHeader(HeaderCollection headers, int contentLength)
         {
-            return $@"HTTP/1.1 200 OK 
-Server: SEDC Data Web Server
-Content-Length: {contentLength}
-Connection: close
-Content-Type: text\plain
-
-";
+            StringBuilder sb = new StringBuilder("HTTP/1.1 200 OK\r\nServer: SEDC Data Web Server\r\n");
+            sb.AppendLine($"Content-Length: {contentLength}");
+            foreach (var header in headers)
+            {
+                sb.AppendLine($"{header.Name}: {header.Value}");
+            }
+            sb.AppendLine();
+            return sb.ToString();
         }
     }
 }

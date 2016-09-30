@@ -51,10 +51,18 @@
     <Compile Include="RequestData.cs" />
     <Compile Include="RequestHandler.cs" />
     <Compile Include="RequestParser.cs" />
+    <Compile Include="ResponseData.cs" />
+    <Compile Include="ResponseGenerator.cs" />
+    <Compile Include="TagWriter.cs" />
     <Compile Include="WebServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
