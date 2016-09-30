@@ -3,14 +3,14 @@ using System.Text;
 
 namespace DemoServer
 {
-    internal class ResponseGenerator
+    internal class StringResponseGenerator : IResponseGenerator
     {
-        public ResponseGenerator()
+        public StringResponseGenerator()
         {
         }
-        public ResponseData GenerateResponse(RequestData request)
+        public IResponseData GenerateResponse(RequestData request)
         {
-            var result = new ResponseData();
+            var result = new ResponseData<string>();
             result.Headers = new HeaderCollection();
             result.Headers.Add("Content-type", "text/html");
             StringBuilder sb = new StringBuilder();
@@ -28,7 +28,7 @@ namespace DemoServer
             {
                 sb.Append(TagWriter.Create("div", $"{param.Key}: {param.Value}"));
             }
-            result.Body = sb.ToString();
+            result.Payload = sb.ToString();
             return result;
         }
     }

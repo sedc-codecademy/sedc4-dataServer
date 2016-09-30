@@ -43,8 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinaryResponseData.cs" />
+    <Compile Include="FileResponseGenerator.cs" />
     <Compile Include="Header.cs" />
     <Compile Include="HeaderCollection.cs" />
+    <Compile Include="IResponseData.cs" />
+    <Compile Include="IResponseGenerator.cs" />
     <Compile Include="Method.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -52,7 +56,8 @@
     <Compile Include="RequestHandler.cs" />
     <Compile Include="RequestParser.cs" />
     <Compile Include="ResponseData.cs" />
-    <Compile Include="ResponseGenerator.cs" />
+    <Compile Include="StringResponseGenerator.cs" />
+    <Compile Include="StatusCode.cs" />
     <Compile Include="TagWriter.cs" />
     <Compile Include="WebServer.cs" />
   </ItemGroup>

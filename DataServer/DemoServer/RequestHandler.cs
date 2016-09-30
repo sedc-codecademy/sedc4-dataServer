@@ -35,42 +35,23 @@ namespace DemoServer
             var requestParser = new RequestParser();
             var parsedRequest = requestParser.ParseRequest(request);
 
-            //return response
+            IResponseGenerator responseGenerator;
             if ((parsedRequest.Method == Method.Get) && (parsedRequest.Location == "/favicon.ico"))
             {
-                var responseBytes = File.ReadAllBytes("favicon.ico");
-                var headers = new HeaderCollection();
-                headers.Add("Content-Type", "image/ico");
-                string headersString = MakeHeader(headers, responseBytes.Length);
-                var headerBytes = Encoding.UTF8.GetBytes(headersString);
-                clientSocket.Send(headerBytes);
-                clientSocket.Send(responseBytes);
+                responseGenerator = new FileResponseGenerator();
             }
             else
             {
-                var responseGenerator = new ResponseGenerator();
-
-                var myResponse = responseGenerator.GenerateResponse(parsedRequest);
-                var responseBytes = Encoding.UTF8.GetBytes(myResponse.Body);
-
-                string headers = MakeHeader(myResponse.Headers, responseBytes.Length);
-                var headerBytes = Encoding.UTF8.GetBytes(headers);
-                clientSocket.Send(headerBytes);
-                clientSocket.Send(responseBytes);
+                responseGenerator = new StringResponseGenerator();
             }
+
+            var myResponse = responseGenerator.GenerateResponse(parsedRequest);
+            var responseBytes = myResponse.GetBytes();
+
+            clientSocket.Send(responseBytes);
             clientSocket.Close();
         }
 
-        private string MakeHeader(HeaderCollection headers, int contentLength)
-        {
-            StringBuilder sb = new StringBuilder("HTTP/1.1 200 OK\r\nServer: SEDC Data Web Server\r\n");
-            sb.AppendLine($"Content-Length: {contentLength}");
-            foreach (var header in headers)
-            {
-                sb.AppendLine($"{header.Name}: {header.Value}");
-            }
-            sb.AppendLine();
-            return sb.ToString();
-        }
+        
     }
 }
