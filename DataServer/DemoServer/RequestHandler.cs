@@ -35,16 +35,7 @@ namespace DemoServer
             var requestParser = new RequestParser();
             var parsedRequest = requestParser.ParseRequest(request);
 
-            IResponseGenerator responseGenerator;
-            if ((parsedRequest.Method == Method.Get) && (parsedRequest.Location == "/favicon.ico"))
-            {
-                responseGenerator = new FileResponseGenerator();
-            }
-            else
-            {
-                responseGenerator = new StringResponseGenerator();
-            }
-
+            var responseGenerator = GeneratorFactory.GetResponseGenerator(parsedRequest);
             var myResponse = responseGenerator.GenerateResponse(parsedRequest);
             var responseBytes = myResponse.GetBytes();
 
