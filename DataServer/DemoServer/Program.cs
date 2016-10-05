@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using DataServer.Responses;
 using DataServer.Requests;
 using DataServer.MsSql;
+using DataServer.FileManager;
 
 namespace DemoServer
 {
@@ -16,7 +17,8 @@ namespace DemoServer
         {
             var port = 8082;
             WebServer ws = new WebServer(port);
-            ws.Factory.RegisterGenerator<MsSqlResponseGenerator>("mssql");
+            ws.Factory.RegisterGenerator<MsSqlResponseGenerator>("sql-server");
+            ws.Factory.RegisterGenerator<FileDetailsGenerator>("file");
             ws.Start();
         }
     }

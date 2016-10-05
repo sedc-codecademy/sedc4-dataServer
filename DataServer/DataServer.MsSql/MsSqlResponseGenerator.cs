@@ -15,36 +15,140 @@ namespace DataServer.MsSql
 {
     public class MsSqlResponseGenerator : IResponseGenerator
     {
-        private Regex fullPathRegex = new Regex(@"^\/mssql\/([^\/]*)\/([^\/]*)\/([^\/]*)\/([^\/]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         public IResponseData GenerateResponse(RequestData request)
+        {
+            var parsedCommand = CommandParser.ParseCommand(GetPath(request.Location));
+            switch (parsedCommand.CommandType)
+            {
+                case CommandType.TableLevelCommand:
+                    return GetTableResponseData(parsedCommand);
+                case CommandType.DatabaseLevelCommand:
+                    return GetDatabaseTables(parsedCommand);
+                case CommandType.ServerLevelCommand:
+                    return GetServerDatabases(parsedCommand);
+                case CommandType.WrongFormat:
+                default:
+                    return new ErrorResponseData(StatusCode.NotImplemented);
+            }
+        }
+
+        private IResponseData GetServerDatabases(ParsedCommand parsedCommand)
         {
             var result = new ResponseData<string>();
             result.Headers.Add("Content-type", "application/json");
-
-            var match = fullPathRegex.Match(request.Location);
-            if (!match.Success)
+            try
             {
-                return new ErrorResponseData(StatusCode.NotImplemented);
+                var connectionData = new ConnectionData
+                {
+                    AuthType = AuthenticationType.Windows,
+                    ServerName = parsedCommand.ServerName
+                };
+                var service = new DataBrowseService(connectionData);
+                service.Connect().Wait();
+                var data = service.GetDatabaseNames().Result;
+                var dataJson = JsonConvert.SerializeObject(data);
+
+                result.Payload = dataJson;
+                return result;
+            }
+            catch (Exception)
+            {
+                return new ErrorResponseData(StatusCode.BadRequest);
+            }
+        }
+
+        private IResponseData GetDatabaseTables(ParsedCommand parsedCommand)
+        {
+            try
+            {
+                var result = new ResponseData<string>();
+                result.Headers.Add("Content-type", "application/json");
+                var connectionData = new ConnectionData
+                {
+                    AuthType = AuthenticationType.Windows,
+                    ServerName = parsedCommand.ServerName
+                };
+                var service = new DataBrowseService(connectionData);
+                service.Connect().Wait();
+                var data = service.GetTableNames(parsedCommand.DatabaseName).Result;
+                var dataJson = JsonConvert.SerializeObject(data);
+
+                result.Payload = dataJson;
+                return result;
+            }
+            catch (Exception)
+            {
+                return new ErrorResponseData(StatusCode.BadRequest);
             }
 
-            var serverName = WebUtility.UrlDecode(match.Groups[1].Value);
-            var databaseName = WebUtility.UrlDecode(match.Groups[2].Value);
-            var tableName = WebUtility.UrlDecode(match.Groups[3].Value);
-            var action = WebUtility.UrlDecode(match.Groups[4].Value);
+        }
 
-            var connectionData = new ConnectionData
+        private IResponseData GetTableResponseData(ParsedCommand parsedCommand)
+        {
+            try
             {
-                AuthType = AuthenticationType.Windows,
-                ServerName = serverName
-            };
-            var service = new DataBrowseService(connectionData);
+                var result = new ResponseData<string>();
+                result.Headers.Add("Content-type", "application/json");
+                var connectionData = new ConnectionData
+                {
+                    AuthType = AuthenticationType.Windows,
+                    ServerName = parsedCommand.ServerName
+                };
+                var service = new DataBrowseService(connectionData);
+                service.Connect().Wait();
 
-            var data = service.GetData(databaseName, tableName);
-            var dataJson = JsonConvert.SerializeObject(data);
+                //dynamic data;
 
-            result.Payload = dataJson;
-            return result;
+                //switch (parsedCommand.Action.ToLowerInvariant())
+                //{
+                //    case "names":
+                //        data = service.GetColumnNames(parsedCommand.DatabaseName, parsedCommand.TableName).Result;
+                //        break;
+                //    case "data":
+                //        data = service.GetData(parsedCommand.DatabaseName, parsedCommand.TableName).Result;
+                //        break;
+                //    default:
+                //        return new ErrorResponseData(StatusCode.NotImplemented);
+                //}
+
+                string methodName;
+                switch (parsedCommand.Action.ToLowerInvariant())
+                {
+                    case "names":
+                        methodName = "GetColumnNames";
+                        break;
+                    case "data":
+                        methodName = "GetData";
+                        break;
+                    default:
+                        return new ErrorResponseData(StatusCode.NotImplemented);
+                }
+
+                var serviceType = service.GetType();
+                var method = serviceType.GetMethod(methodName);
+                var objectResult = method.Invoke(service, new object[] { parsedCommand.DatabaseName, parsedCommand.TableName });
+
+                var objectResultType = objectResult.GetType();
+                var resultProperty = objectResultType.GetProperty("Result");
+                var data = resultProperty.GetValue(objectResult);
+
+                var dataJson = JsonConvert.SerializeObject(data);
+
+                result.Payload = dataJson;
+                return result;
+            }
+            catch (Exception)
+            {
+                return new ErrorResponseData(StatusCode.BadRequest);
+            }
+
+        }
+
+        private string GetPath(string location)
+        {
+            var indexOfSlash = location.IndexOf("/", 1);
+            var path = location.Substring(indexOfSlash + 1);
+            return path;
         }
     }
 }
