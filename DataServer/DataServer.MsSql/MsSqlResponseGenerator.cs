@@ -141,7 +141,6 @@ namespace DataServer.MsSql
             {
                 return new ErrorResponseData(StatusCode.BadRequest);
             }
-
         }
 
         private string GetPath(string location)
