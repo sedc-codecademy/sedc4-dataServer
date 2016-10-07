@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoServer", "DemoServer\De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataServer.FileManager", "DataServer.FileManager\DataServer.FileManager.csproj", "{239438EA-1FD2-447A-81D7-9493F43D8FD1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoServerService", "DemoServerService\DemoServerService.csproj", "{655DEAD7-C638-4937-B12C-4F50AF81D6B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{239438EA-1FD2-447A-81D7-9493F43D8FD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{239438EA-1FD2-447A-81D7-9493F43D8FD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{239438EA-1FD2-447A-81D7-9493F43D8FD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{655DEAD7-C638-4937-B12C-4F50AF81D6B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{655DEAD7-C638-4937-B12C-4F50AF81D6B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{655DEAD7-C638-4937-B12C-4F50AF81D6B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{655DEAD7-C638-4937-B12C-4F50AF81D6B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

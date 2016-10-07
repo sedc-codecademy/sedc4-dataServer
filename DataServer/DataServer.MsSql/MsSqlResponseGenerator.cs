@@ -10,14 +10,18 @@ using System.Text.RegularExpressions;
 using DataServer.Entities;
 using System.Net;
 using Newtonsoft.Json;
+using log4net;
 
 namespace DataServer.MsSql
 {
     public class MsSqlResponseGenerator : IResponseGenerator
     {
+        private static readonly ILog log = LogManager.GetLogger("mssql-logger");
+
         public IResponseData GenerateResponse(RequestData request)
         {
             var parsedCommand = CommandParser.ParseCommand(GetPath(request.Location));
+            log.Debug($"parsed command value is {parsedCommand}");
             switch (parsedCommand.CommandType)
             {
                 case CommandType.TableLevelCommand:
@@ -34,6 +38,7 @@ namespace DataServer.MsSql
 
         private IResponseData GetServerDatabases(ParsedCommand parsedCommand)
         {
+            log.Debug($"Starting GetServerDatabases call");
             var result = new ResponseData<string>();
             result.Headers.Add("Content-type", "application/json");
             try
@@ -51,8 +56,9 @@ namespace DataServer.MsSql
                 result.Payload = dataJson;
                 return result;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                log.Error($"Exception in GetServerDatabases call: {ex.Message}");
                 return new ErrorResponseData(StatusCode.BadRequest);
             }
         }
@@ -76,8 +82,10 @@ namespace DataServer.MsSql
                 result.Payload = dataJson;
                 return result;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                var message = string.Join("-", ex.GetMessages());
+                log.Error($"Exception in GetDatabaseTables call: {message} ({ex.GetType().FullName})");
                 return new ErrorResponseData(StatusCode.BadRequest);
             }
 
@@ -121,7 +129,10 @@ namespace DataServer.MsSql
                         methodName = "GetData";
                         break;
                     default:
-                        return new ErrorResponseData(StatusCode.NotImplemented);
+                        {
+                            log.Warn($"Invoked method {parsedCommand.Action.ToLowerInvariant()} - not available");
+                            return new ErrorResponseData(StatusCode.NotImplemented);
+                        }
                 }
 
                 var serviceType = service.GetType();

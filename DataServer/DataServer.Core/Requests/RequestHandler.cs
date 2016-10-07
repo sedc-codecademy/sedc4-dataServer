@@ -1,4 +1,5 @@
 ﻿using DataServer.Responses;
+using log4net;
 using System;
 using System.IO;
 using System.Net.Sockets;
@@ -12,6 +13,8 @@ namespace DataServer.Requests
     {
         private Socket socket;
         private GeneratorFactory factory;
+        private static readonly ILog log = LogManager.GetLogger(typeof(RequestHandler));
+
 
         public RequestHandler(Socket socket, GeneratorFactory factory)
         {
@@ -22,7 +25,7 @@ namespace DataServer.Requests
         internal async Task AcceptRequest()
         {
             var clientSocket = socket.Accept();
-            Console.WriteLine("Accepted call");
+            log.Info("Accepted call");
             await Task.Run(() => HandleRequest(clientSocket));
         }
 
@@ -32,7 +35,7 @@ namespace DataServer.Requests
             var buffer = new byte[10240];
             var receivedCount = clientSocket.Receive(buffer);
             var request = Encoding.UTF8.GetString(buffer, 0, receivedCount);
-            Console.WriteLine(request);
+            log.Debug(request);
 
             //parse request
             var requestParser = new RequestParser();
@@ -41,6 +44,8 @@ namespace DataServer.Requests
             var responseGenerator = factory.GetResponseGenerator(parsedRequest);
             var myResponse = responseGenerator.GenerateResponse(parsedRequest);
             var responseBytes = myResponse.GetBytes();
+
+            log.Info($"response is {responseBytes.Length} bytes long");
 
             clientSocket.Send(responseBytes);
             clientSocket.Close();

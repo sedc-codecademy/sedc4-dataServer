@@ -8,6 +8,8 @@ using DataServer.Responses;
 using DataServer.Requests;
 using DataServer.MsSql;
 using DataServer.FileManager;
+using System.Configuration;
+using log4net.Config;
 
 namespace DemoServer
 {
@@ -15,10 +17,20 @@ namespace DemoServer
     {
         static void Main(string[] args)
         {
-            var port = 8082;
-            WebServer ws = new WebServer(port);
-            ws.Factory.RegisterGenerator<MsSqlResponseGenerator>("sql-server");
-            ws.Factory.RegisterGenerator<FileDetailsGenerator>("file");
+            XmlConfigurator.Configure();
+
+            var port = int.Parse(ConfigurationManager.AppSettings["port"]);
+            var folder = ConfigurationManager.AppSettings["folder"];
+
+            var config = new WebServerConfig
+            {
+                Port = port,
+                Folder = folder
+            };
+
+            config.Factory.RegisterGenerator<MsSqlResponseGenerator>("sql-server");
+            config.Factory.RegisterGenerator<FileDetailsGenerator>("file");
+            var ws = new WebServer(config);
             ws.Start();
         }
     }
